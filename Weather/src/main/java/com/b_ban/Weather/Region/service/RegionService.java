@@ -1,6 +1,8 @@
 package com.b_ban.Weather.Region.service;
 
 import com.b_ban.Weather.Region.entity.Region;
+import com.b_ban.Weather.Region.repository.RegionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -11,7 +13,10 @@ import java.util.List;
 // RegionService.java
 
 @Service
+@RequiredArgsConstructor
 public class RegionService {
+
+    private final RegionRepository regionRepository;
 
     // CSV 파일에서 지역 데이터를 읽어 List<Region>으로 만들어주는 서비스
     public List<Region> readCsv(){
@@ -50,5 +55,11 @@ public class RegionService {
             e.printStackTrace();
         }
         return regions;
+    }
+
+    // 지역 좌표 조회 메서드
+    public Region getRegion(String parent, String child) {
+        return regionRepository.findByParentRegionAndChildRegion(parent, child)
+                .orElseThrow(() -> new IllegalArgumentException("해당 지역이 없습니다."));
     }
 }

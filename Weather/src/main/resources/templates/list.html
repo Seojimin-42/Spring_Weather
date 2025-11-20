@@ -1,8 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>지역 날씨</title>
+</head>
 <body>
-    <div>
-        <h4 th:text="${name}"></h4>
-    </div>
+<h2 th:text="${regionName} + ' 날씨 정보'"></h2>
+
+<ul>
+    <li>🌡 온도: <span th:text="${weather.temperature}"></span> ℃</li>
+    <li>💧 습도: <span th:text="${weather.humidity}"></span> %</li>
+    <li>☔ 강수량: <span th:text="${weather.rainfall}"></span> mm</li>
+    <li>🕒 기준 시각: <span th:text="${weather.time}"></span></li>
+</ul>
+
 </body>
 </html>

@@ -38,3 +38,11 @@ spring:
     properties:
       hibernate:
         format_sql: true    # SQL 포맷팅 여부
+
+####################################
+# api 키 설정
+####################################
+weather:
+  api:
+    url: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
+    key: "RP9JbUAQI8f1h5EGK8KkGGg%2Ftk%2FUNaQtFqrYPbXi3qb4mJrr1r0Hf3Cf%2BKwVIH0IeuobOIFAC7hTLj0Ctt%2FSkQ%3D%3D"

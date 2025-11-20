@@ -17,7 +17,7 @@ spring:
       enabled: true
 
   ####################################
-  # MySQL ??
+  # MySQL 설정
   ####################################
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -26,15 +26,23 @@ spring:
     password: 1234
 
   ####################################
-  # JPA ??
+  # JPA 설정
   ####################################
   jpa:
     open-in-view: true      #
     hibernate:
       ddl-auto: update      # create, update, ...
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy # ?????? ?????? ?? ex. myName -> my_name
-    show-sql: true          # SQL ?? ??
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy # 카멜케이스를 언더스코어로 변환 ex. myName -> my_name
+    show-sql: true          # SQL 출력 여부
     properties:
       hibernate:
-        format_sql: true    # SQL ??? ??
+        format_sql: true    # SQL 포맷팅 여부
+
+####################################
+# api 키 설정
+####################################
+weather:
+  api:
+    url: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
+    key: "RP9JbUAQI8f1h5EGK8KkGGg%2Ftk%2FUNaQtFqrYPbXi3qb4mJrr1r0Hf3Cf%2BKwVIH0IeuobOIFAC7hTLj0Ctt%2FSkQ%3D%3D"
