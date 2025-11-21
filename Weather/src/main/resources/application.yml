@@ -45,4 +45,4 @@ spring:
 weather:
   api:
     url: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
-    key: "RP9JbUAQI8f1h5EGK8KkGGg%2Ftk%2FUNaQtFqrYPbXi3qb4mJrr1r0Hf3Cf%2BKwVIH0IeuobOIFAC7hTLj0Ctt%2FSkQ%3D%3D"
+    key: "62404a110929bd956f1254b7d3b5cc5f9d875d4c842554271d885109be16c450"

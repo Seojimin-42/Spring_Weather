@@ -11,7 +11,8 @@
     <li>🌡 온도: <span th:text="${weather.temperature}"></span> ℃</li>
     <li>💧 습도: <span th:text="${weather.humidity}"></span> %</li>
     <li>☔ 강수량: <span th:text="${weather.rainfall}"></span> mm</li>
-    <li>🕒 기준 시각: <span th:text="${weather.time}"></span></li>
+    <li>🕒 기상청 데이터 기준 시각: <span th:text="${weather.time}"></span></li>
+    <li>📌 조회 시각: <span th:text="${weather.requestTime}"></span></li>
 </ul>
 
 </body>
