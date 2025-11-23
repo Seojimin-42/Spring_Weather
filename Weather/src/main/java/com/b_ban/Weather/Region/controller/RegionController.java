@@ -1,5 +1,6 @@
 package com.b_ban.Weather.Region.controller;
 
+import com.b_ban.Weather.Common.util.SolarTermUtil;
 import com.b_ban.Weather.Region.service.RegionService;
 import com.b_ban.Weather.Weather.dto.WeatherDto;
 import com.b_ban.Weather.Weather.service.WeatherService;
@@ -9,7 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-// WeatherController.java
+// RegionController.java
 
 @Controller // 웹 요청 컨트롤러
 @RequiredArgsConstructor
@@ -27,6 +28,9 @@ public class RegionController {
         model.addAttribute("regionName", parent + " " + child);
         model.addAttribute("weather", weatherService.getWeather(parent, child));
 
+        // 절기 추가
+        model.addAttribute("solarTerm", SolarTermUtil.getCurrentSolarTerm());
+
         return "list";
     }
 
@@ -42,6 +46,11 @@ public class RegionController {
         model.addAttribute("regionName", fullName);
         model.addAttribute("weather", weather);
 
+        // 절기 추가
+        model.addAttribute("solarTerm", SolarTermUtil.getCurrentSolarTerm());
+
         return "list";
     }
+
+
 }
