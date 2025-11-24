@@ -1,5 +1,6 @@
 package com.b_ban.Weather;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,4 +18,8 @@ public class WeatherApplication {
 		return new RestTemplate();
 	}
 
+	@Bean
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
+	}
 }

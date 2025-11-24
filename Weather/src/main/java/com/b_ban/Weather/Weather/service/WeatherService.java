@@ -34,10 +34,10 @@ public class WeatherService {
     private final RegionService regionService;
     private final RestTemplate restTemplate;
 
-    @Value("${weather.api.key}") // application.yml에서 API KEY 불러옴
+    @Value("${api.weather.key}") // application.yml에서 API KEY 불러옴
     private String serviceKey; // application.yml에 작성한 값을 변수 serviceKey 안에 넣음
 
-    @Value("${weather.api.url}") // application.yml에서 yml 불러옴
+    @Value("${api.weather.url}") // application.yml에서 yml 불러옴
     private String apiUrl; // application.yml에 작성한 값을 변수 apiUrl 안에 넣음
 
     public WeatherDto getWeather(String parent, String child) {

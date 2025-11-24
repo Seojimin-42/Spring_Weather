@@ -42,7 +42,11 @@ spring:
 ####################################
 # api 키 설정
 ####################################
-weather:
-  api:
+api:
+  weather:
     url: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
+    key: "62404a110929bd956f1254b7d3b5cc5f9d875d4c842554271d885109be16c450"
+
+  airkorea:
+    url: "https://api.odcloud.kr/api/MinuDustFrcstDspthSvrc/v1"
     key: "62404a110929bd956f1254b7d3b5cc5f9d875d4c842554271d885109be16c450"
