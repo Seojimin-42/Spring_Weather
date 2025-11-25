@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+
+// AirKoreaService.java
+
 @Service
 @RequiredArgsConstructor
 public class AirKoreaService {
@@ -14,6 +18,7 @@ public class AirKoreaService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    // application.yml
     @Value("${api.airkorea.key}")
     private String apiKey;
 
@@ -21,32 +26,7 @@ public class AirKoreaService {
     private String baseUrl;
 
     // -------------------------
-    // 1) 고농도 초미세먼지 (50µg 초과) 여기서, Pm25 -> Pm2.5로 초미세먼지를 말함
-    // -------------------------
-    public String getHighPm25Forecast(String date) {
-        String url = baseUrl + "/getMinuDustFrcstDspth50Over" +
-                "?serviceKey=" + apiKey +
-                "&returnType=json" +
-                "&searchDate=" + date;
-
-        try {
-            String json = restTemplate.getForObject(url, String.class);
-            JsonNode items = objectMapper.readTree(json)
-                    .path("response").path("body").path("items");
-
-            if (items.isArray() && items.size() > 0) {
-                JsonNode first = items.get(0);
-                // 전국 요약 (informOverall)만 일단 사용
-                return first.path("informOverall").asText();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "고농도 초미세먼지 정보 없음";
-    }
-
-    // -------------------------
-    // 2) 대기질 예보통보 (종합: PM10 / PM2.5 / O3)
+    // 대기질 예보통보 (종합: PM10 / PM2.5 / O3)
     // -------------------------
     public String getAirForecast(String date, String parentRegion, String informCode) {
         // informCode 예: "PM10", "PM2.5", "O3"
@@ -58,21 +38,42 @@ public class AirKoreaService {
 
         try {
             String json = restTemplate.getForObject(url, String.class);
-            JsonNode items = objectMapper.readTree(json)
-                    .path("response").path("body").path("items");
+            JsonNode root = objectMapper.readTree(json);
+            JsonNode header = root.path("response").path("header");
+            String resultCode = header.path("resultCode").asText();
+            String resultMsg = header.path("resultMsg").asText();
 
-            if (items.isArray() && items.size() > 0) {
-                JsonNode first = items.get(0);
-                // "서울 : 나쁨,제주 : 보통,..." 이런 문자열
-                String gradeText = first.path("informGrade").asText();
+            JsonNode body  = root.path("response").path("body");
+            JsonNode items = body.path("items");
 
-                String regionKey = normalizeRegionName(parentRegion); // "서울특별시" -> "서울"
-                return extractRegionGrade(gradeText, regionKey);
+            boolean hasData =
+                    ("00".equals(resultCode) || "200".equals(resultCode))
+                            && items.isArray()
+                            && items.size() > 0;
+
+            //  오늘 날짜인데 데이터가 없으면 -> 어제로 한 번 더 재시도
+            if (!hasData) {
+                LocalDate d = LocalDate.parse(date);
+                if (d.isEqual(LocalDate.now())) {
+                    String yesterday = d.minusDays(1).toString();
+                    return getAirForecast(yesterday, parentRegion, informCode);
+                }
+                // 오늘도 아니고, 어제도 아니면 그냥 "예보 없음"
+                return "대기질 예보 정보 없음";
             }
+
+            // 여기까지 왔으면 items 에 최소 1개는 있음
+            JsonNode first = items.get(0);
+            // "서울 : 나쁨,제주 : 보통,..." 이런 문자열
+            String gradeText = first.path("informGrade").asText();
+
+            String regionKey = normalizeRegionName(parentRegion); // "서울특별시" -> "서울"
+            return extractRegionGrade(gradeText, regionKey);
+
         } catch (Exception e) {
             e.printStackTrace();
+            return "대기질 예보 정보 없음";
         }
-        return "대기질 예보 정보 없음";
     }
 
     // 8개의 지역 시 이름 변환 (ex. "서울특별시" -> "서울" )

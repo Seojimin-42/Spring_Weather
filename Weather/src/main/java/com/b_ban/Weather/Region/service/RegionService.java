@@ -1,5 +1,6 @@
 package com.b_ban.Weather.Region.service;
 
+import com.b_ban.Weather.Region.dto.RegionDto;
 import com.b_ban.Weather.Region.entity.Region;
 import com.b_ban.Weather.Region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +62,18 @@ public class RegionService {
     public Region getRegion(String parent, String child) {
         return regionRepository.findByParentRegionAndChildRegion(parent, child)
                 .orElseThrow(() -> new IllegalArgumentException("해당 지역이 없습니다."));
+    }
+
+    // 검색용 메서드 추가
+    public List<RegionDto> searchRegions(String keyword) {
+        return regionRepository
+                .findByParentRegionContainsOrChildRegionContains(keyword, keyword)
+                .stream()
+                .map(r -> RegionDto.builder()
+                        .id(r.getId())
+                        .parentRegion(r.getParentRegion())
+                        .childRegion(r.getChildRegion())
+                        .build())
+                .toList();
     }
 }

@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -52,6 +50,9 @@ public class WeatherService {
         // 키를 여기서 직접 URL Encode
         String encodedKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
 
+        // 최대 3번까지 이전 시각으로 다시 시도
+        for (int retry = 0; retry < 3; retry++) {
+
         // API 요청 URL 생성 + 인코딩
         String url = String.format(
                 "%s?serviceKey=%s&pageNo=1&numOfRows=100&dataType=JSON" +
@@ -73,8 +74,35 @@ public class WeatherService {
             log.info("✅ API body: {}", response.getBody());
 
             String json = response.getBody();
-            System.out.println("📌 RAW JSON >>> " + json);
-            return parseWeather(json);
+//            System.out.println("📌 RAW JSON >>> " + json);
+
+            // --- 여기서 먼저 header(resultCode) 확인 ---
+            JSONObject root = new JSONObject(json);
+            JSONObject header = root.getJSONObject("response").getJSONObject("header");
+            String resultCode = header.getString("resultCode");
+
+            if ("00".equals(resultCode)) {
+                // 정상 데이터 있을 때만 파싱
+                return parseWeather(json);
+            }
+
+            // NO_DATA 인 경우 → 한 시간 이전으로 이동해서 다시 시도
+            if ("03".equals(resultCode)) {
+                log.warn("⚠ NO_DATA, 이전 시각으로 재시도");
+
+                DateTimeFormatter dtFmt = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+                LocalDateTime base = LocalDateTime.parse(baseDate + baseTime, dtFmt)
+                        .minusHours(1);
+
+                baseDate = base.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                baseTime = base.format(DateTimeFormatter.ofPattern("HHmm"));
+                continue;   // for문 다음 루프에서 다시 요청
+            }
+
+            // 그 외 코드면 그대로 에러 처리
+            log.error("❌ API Error resultCode={}, resultMsg={}",
+                    resultCode, header.optString("resultMsg"));
+            break;
 
         } catch (HttpClientErrorException e) {
             log.error("❌ API ERROR status: {}", e.getStatusCode());
@@ -83,25 +111,50 @@ public class WeatherService {
         }
     }
 
+        // 여기까지 왔다는 건 3번 다 실패한 경우
+        return WeatherDto.builder()
+                .temperature(null)
+                .humidity(null)
+                .rainfall(null)
+                .time("최근 기상청 데이터 없음")
+                .requestTime(LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")))
+                .build();
+    }
+
     // 기상청 시간 규칙: 매시각 40분 이전에는 이전 시간 조회
     private String getNearestBaseTime() {
         LocalTime now = LocalTime.now();
+        int hour = now.getHour();
+        int minute = now.getMinute();
 
-        // 현재 분이 30분 전이면 한 시간 전으로
-        if (now.getMinute() < 30) {
-            now = now.minusHours(1);
+        // 매시각 40분 이전은 한 시간 전 데이터 사용
+        if (minute < 40) {
+            hour = (hour - 1 + 24) % 24; // 0시에서 이전으로 넘어갈 때 처리
         }
 
-        return now.format(DateTimeFormatter.ofPattern("HH00"));
+        return String.format("%02d00", hour);
     }
 
     // JSON 데이터 파싱 -> DTO로 반환
     private WeatherDto parseWeather(String json) {
         JSONObject root = new JSONObject(json);
-        JSONArray items = root.getJSONObject("response")
-                .getJSONObject("body")
-                .getJSONObject("items")
-                .getJSONArray("item");
+        JSONObject response = root.optJSONObject("response");
+        if (response == null) return emptyWeather("날씨 정보 없음");
+
+        JSONObject header = response.optJSONObject("header");
+        if (header != null && !"00".equals(header.optString("resultCode"))) {
+            return emptyWeather(header.optString("resultMsg"));
+        }
+
+        JSONObject body = response.optJSONObject("body");
+        if (body == null) return emptyWeather("관측값 없음");
+
+        JSONObject itemsObj = body.optJSONObject("items");
+        if (itemsObj == null) return emptyWeather("항목 없음");
+
+        JSONArray items = itemsObj.optJSONArray("item");
+        if (items == null || items.isEmpty()) return emptyWeather("측정소 없음");
 
         Double temp = null, humidity = null, rain = null;
         String time = null;
@@ -131,6 +184,17 @@ public class WeatherService {
                 .humidity(humidity)
                 .rainfall(rain)
                 .time(time) // 기상청 날씨 데이터 기준 시간
+                .requestTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")))
+                .build();
+    }
+
+    // 데이터가 없을 때 안전하게 반환하는 메서드
+    private WeatherDto emptyWeather(String message) {
+        return WeatherDto.builder()
+                .temperature(null)
+                .humidity(null)
+                .rainfall(null)
+                .time(message)  // "NO DATA" 같은 안내 문구로 사용
                 .requestTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")))
                 .build();
     }
