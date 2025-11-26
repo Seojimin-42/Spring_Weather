@@ -5,57 +5,15 @@
 <head>
     <meta charset="UTF-8">
     <title>지역 날씨 검색</title>
-
-    <style>
-        /* 검색 박스를 감싸는 컨테이너 */
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        /* 자동완성 박스 */
-        .suggest-box {
-            position: absolute;
-            top: 100%;          /* input 바로 아래 */
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #ccc;
-            border-top: none;
-            max-height: 250px;
-            overflow-y: auto;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            z-index: 100;
-        }
-
-        .suggest-box.hidden {
-            display: none;
-        }
-
-        .suggest-item {
-            padding: 8px 10px;
-            cursor: pointer;
-        }
-
-        .suggest-item:hover {
-            background: #f3f3f3;
-        }
-
-        .suggest-region {
-            font-weight: 500;
-        }
-
-        .suggest-sub {
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/search.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/script.js"></script>
 </head>
 <body>
 
 <h2>지역 검색</h2>
 
-<!-- 🔎 검색 폼 (기존처럼 엔터/버튼 검색도 가능) -->
+<!-- 검색 폼 (기존처럼 엔터/버튼 검색도 가능) -->
 <form th:action="@{/search}" method="get" autocomplete="off">
     <div class="search-box">
         <input id="region-input"
@@ -65,7 +23,7 @@
                th:value="${keyword}">
         <button type="submit">검색</button>
 
-        <!-- ⬇️ 자동완성 박스 -->
+        <!-- 자동완성 박스 -->
         <div id="suggest-box" class="suggest-box hidden">
             <ul id="suggest-list"></ul>
         </div>
@@ -74,7 +32,7 @@
 
 <hr/>
 
-<!-- 🔍 하단 전체 검색 결과(버튼/엔터 눌렀을 때) -->
+<!-- 하단 전체 검색 결과(버튼/엔터 눌렀을 때) -->
 <div th:if="${results != null}">
     <p th:if="${#lists.isEmpty(results)}">
         검색 결과가 없습니다.
@@ -82,91 +40,11 @@
 
     <ul th:if="${!#lists.isEmpty(results)}">
         <li th:each="r : ${results}">
-            <a th:href="@{/{city}/{district}(city=${r.parentRegion}, district=${r.childRegion})}"
+            <a th:href="@{/region/{city}/{district}(city=${r.parentRegion}, district=${r.childRegion})}"
                th:text="${r.parentRegion} + ' ' + ${r.childRegion}">
             </a>
         </li>
     </ul>
 </div>
-
-<script>
-    const input = document.getElementById('region-input');
-    const suggestBox = document.getElementById('suggest-box');
-    const suggestList = document.getElementById('suggest-list');
-
-    // 입력할 때마다 자동완성 요청
-    input.addEventListener('input', async (e) => {
-        const q = e.target.value.trim();
-
-        if (q.length === 0) {
-            hideSuggest();
-            return;
-        }
-
-        try {
-            const res = await fetch('/search/suggest?q=' + encodeURIComponent(q));
-            if (!res.ok) {
-                hideSuggest();
-                return;
-            }
-            const data = await res.json();   // [{parentRegion: "...", childRegion: "..."}, ...]
-
-            renderSuggest(data);
-        } catch (err) {
-            console.error(err);
-            hideSuggest();
-        }
-    });
-
-    function renderSuggest(items) {
-        suggestList.innerHTML = '';
-
-        if (!items || items.length === 0) {
-            hideSuggest();
-            return;
-        }
-
-        items.forEach((r) => {
-            const li = document.createElement('li');
-            li.className = 'suggest-item';
-
-            const main = document.createElement('div');
-            main.className = 'suggest-region';
-            main.textContent = r.parentRegion + ' ' + r.childRegion;
-
-            const sub = document.createElement('div');
-            sub.className = 'suggest-sub';
-            sub.textContent = '날씨 보기';
-
-            li.appendChild(main);
-            li.appendChild(sub);
-
-            // 클릭하면 /{city}/{district} 로 이동
-            li.addEventListener('click', () => {
-                const city = encodeURIComponent(r.parentRegion);
-                const district = encodeURIComponent(r.childRegion);
-                window.location.href = `/${city}/${district}`;
-            });
-
-            suggestList.appendChild(li);
-        });
-
-        showSuggest();
-    }
-
-    function showSuggest() {
-        suggestBox.classList.remove('hidden');
-    }
-
-    function hideSuggest() {
-        suggestBox.classList.add('hidden');
-    }
-
-    // input 포커스를 벗어나면 박스를 닫고 싶으면 이 정도도 추가 가능
-    input.addEventListener('blur', () => {
-        setTimeout(hideSuggest, 150); // 클릭 이벤트 먼저 처리 후 닫히도록 살짝 딜레이
-    });
-</script>
-
 </body>
 </html>

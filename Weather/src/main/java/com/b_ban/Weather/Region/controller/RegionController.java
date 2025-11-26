@@ -52,7 +52,7 @@ public class RegionController {
     }
 
     // 사용자가 다른 구를 선택하거나 검색했을 때 해당 구 날씨 보여줌
-    @GetMapping("/{city}/{district}")
+    @GetMapping("/region/{city}/{district}")
     public String getRegionWeather( @PathVariable String city,
                                     @PathVariable String district,
                                     Model model) {
