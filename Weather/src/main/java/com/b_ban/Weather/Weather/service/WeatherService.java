@@ -179,12 +179,26 @@ public class WeatherService {
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분"));
         }
 
+        // 우산 추천 메시지
+        String umbrellaMessage = "";
+
+        if (humidity != null && humidity >= 80) {
+            umbrellaMessage = "습도가 높아 비 올 가능성이 있어요. 우산 챙기면 좋아요!";
+        }
+
+        // 옷 추천
+        ClothesRecommend clothes = pickClothes(temp);
+
         return WeatherDto.builder()
                 .temperature(temp) // ex. Service의 temp 값을 DTO의 temperature 필드에 넣는 것, temp=5.3이면 dto에 5.3을 넣음.
                 .humidity(humidity)
                 .rainfall(rain)
+                .umbrellaMessage(umbrellaMessage)
                 .time(time) // 기상청 날씨 데이터 기준 시간
                 .requestTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")))
+                .clothesImage(clothes.clothesImage())
+                .clothesDetail(clothes.clothesDetail())
+                .clothesSummary(clothes.clothesSummary())
                 .build();
     }
 
@@ -198,4 +212,79 @@ public class WeatherService {
                 .requestTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")))
                 .build();
     }
+
+    private ClothesRecommend pickClothes(Double temp) {
+        if (temp == null) {
+            return new ClothesRecommend("", "", "");
+        }
+
+        if (temp <= -4) {
+            return new ClothesRecommend(
+                    "-4℃.png",
+                    "패딩, 두꺼운 코트, 히트텍/내복, 목도리, 장갑",
+                    "🥶 매우 추워요! 완전 방한 필수!"
+            );
+        } else if (temp <= 0) {
+            return new ClothesRecommend(
+                    "0℃.png",
+                    "패딩 또는 두꺼운 코트 + 니트",
+                    "🧥 겉옷은 꼭 두껍게!"
+            );
+        } else if (temp <= 4) {
+            return new ClothesRecommend(
+                    "4℃.png",
+                    "패딩 또는 두꺼운 코트 + 니트",
+                    "🧥 겉옷은 꼭 두껍게!"
+            );
+        } else if (temp <= 8) {
+            return new ClothesRecommend(
+                    "5℃~8℃.png",
+                    "코트, 가죽자켓, 니트+플리스",
+                    "❄ 쌀쌀해요! 따뜻한 아우터 추천"
+            );
+        } else if (temp <= 11) {
+            return new ClothesRecommend(
+                    "9℃~11℃.png",
+                    "트렌치코트, 야상, 자켓",
+                    "🧥 가벼운 코트/자켓이 딱 좋아요"
+            );
+        } else if (temp <= 16) {
+            return new ClothesRecommend(
+                    "12℃~16℃.png",
+                    "기모후드티, 가디건, 니트/맨투맨",
+                    "🍂 가벼운 겉옷 + 긴팔 추천"
+            );
+        } else if (temp <= 19) {
+            return new ClothesRecommend(
+                    "17℃~19℃.png",
+                    "후드티, 바람막이, 슬랙스",
+                    "🌤 얇은 아우터 정도만 필요해요"
+            );
+        } else if (temp <= 22) {
+            return new ClothesRecommend(
+                    "20℃~22℃.png",
+                    "셔츠, 7부바지, 면바지",
+                    "😄 긴팔 단독으로 입기 좋아요"
+            );
+        } else if (temp <= 27) {
+            return new ClothesRecommend(
+                    "23℃~27℃.png",
+                    "티셔츠, 반바지",
+                    "🌞 반팔 추천! 시원하게 입어요"
+            );
+        } else {
+            return new ClothesRecommend(
+                    "28℃.png",
+                    "민소매, 숏팬츠",
+                    "🔥 무척 더워요! 최대한 시원하게!"
+            );
+        }
+    }
+
+    private record ClothesRecommend(
+            String clothesImage,
+            String clothesDetail,
+            String clothesSummary
+    ) {}
+
 }

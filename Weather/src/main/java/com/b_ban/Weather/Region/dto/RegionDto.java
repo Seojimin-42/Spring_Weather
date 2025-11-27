@@ -10,9 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RegionDto {
-    private double pm25; // 초미세먼지(예보)
-    private double pm10; // 미세먼지(예보)
-    private double o3; // 오존(예보)
 
     private Long id;
     private String parentRegion;  // 시/도

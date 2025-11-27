@@ -2,11 +2,11 @@ package com.b_ban.Weather.Region.controller;
 
 import com.b_ban.Weather.Common.util.SolarTermCalculator;
 import com.b_ban.Weather.Common.util.SolarTermDescription;
+import com.b_ban.Weather.Dust.service.DustService;
 import com.b_ban.Weather.Region.dto.RegionDto;
-import com.b_ban.Weather.Region.entity.Region;
 import com.b_ban.Weather.Region.service.RegionService;
 import com.b_ban.Weather.Weather.dto.WeatherDto;
-import com.b_ban.Weather.Weather.service.AirKoreaService;
+import com.b_ban.Weather.Dust.service.DustService;
 import com.b_ban.Weather.Weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -27,7 +27,7 @@ public class RegionController {
 
     private final RegionService regionService;
     private final WeatherService weatherService;
-    private final AirKoreaService airKoreaService;
+    private final DustService dustService;
 
     // 처음 접속하면 검색 페이지 보여주기
     @GetMapping("/")
@@ -71,13 +71,20 @@ public class RegionController {
         String today = LocalDate.now().toString(); // 오늘날짜
 
         // ) 대기질 예보 통보
-        String pm25 = airKoreaService.getAirForecast(today, city,"PM25"); // 초미세먼지(예보)
-        String pm10 = airKoreaService.getAirForecast(today, city,"PM10");  // 미세먼지(예보)
-        String o3 = airKoreaService.getAirForecast(today, city,"O3");      // 오존(예보)
+        String pm25 = dustService.getAirForecast(today, city,"PM25"); // 초미세먼지(예보)
+        String pm10 = dustService.getAirForecast(today, city,"PM10");  // 미세먼지(예보)
+        String o3 = dustService.getAirForecast(today, city,"O3");      // 오존(예보)
 
         model.addAttribute("pm25", pm25);     // 초미세먼지(예보)
         model.addAttribute("pm10", pm10);     // 미세먼지(예보)
         model.addAttribute("o3", o3);         // 오존(예보)
+
+        // 미세먼지/초미세먼지 중 하나라도 "나쁨/매우 나쁨"이면 mask.png 반환 및 미세먼지 알림
+        String maskImage = dustService.getMaskImageForForecast(pm10, pm25);
+        String dustSummary = dustService.buildDustSummary(pm10, pm25);
+
+        model.addAttribute("maskImage", maskImage);
+        model.addAttribute("dustSummary", dustSummary);
 
         return "list";
     }
