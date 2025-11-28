@@ -1,50 +1,102 @@
-<!-- search.html -->
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>지역 날씨 검색</title>
-    <link rel="stylesheet" href="/css/search.css">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/script.js"></script>
-</head>3
-<body>
+    <title>How is the Weather</title>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#fddfe8] flex items-center justify-center">
 
-<h2>지역 검색</h2>
+<div class="w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl px-10 py-10">
 
-<!-- 검색 폼 (기존처럼 엔터/버튼 검색도 가능) -->
-<form th:action="@{/search}" method="get" autocomplete="off">
-    <div class="search-box">
-        <input id="region-input"
-               type="text"
-               name="q"
-               placeholder="예) 서울, 종로, 인천 서구"
-               th:value="${keyword}">
-        <button type="submit">검색</button>
+    <!-- 상단 타이틀 -->
+    <header class="text-center mb-8">
+        <h1 class="text-5xl font-black leading-tight">
+            <span class="block text-[#4c82ff]">How is the</span>
+            <span class="block text-[#8ac8ff]">Weather</span>
+        </h1>
+        <p class="mt-2 tracking-[0.3em] text-xs text-slate-500">
+            PLAN TOUR DAY
+        </p>
+    </header>
 
-        <!-- 자동완성 박스 -->
-        <div id="suggest-box" class="suggest-box hidden">
-            <ul id="suggest-list"></ul>
-        </div>
-    </div>
-</form>
+    <!-- 검색 영역 -->
+    <section class="flex justify-center mb-10">
+        <form th:action="@{/search}" method="get" class="flex gap-2">
+            <input
+                    type="text"
+                    name="q"
+                    th:value="${keyword}"
+                    placeholder="예) 서울, 종로, 인천 서구"
+                    class="w-72 px-4 py-2 border border-slate-300 rounded-lg text-sm
+                           focus:outline-none focus:ring-2 focus:ring-[#8ac8ff] focus:border-[#8ac8ff]"
+            />
+            <button
+                    type="submit"
+                    class="px-4 py-2 text-sm font-semibold bg-slate-800 text-white rounded-lg
+                           hover:bg-slate-900 transition">
+                검색
+            </button>
+        </form>
+    </section>
 
-<hr/>
+    <!-- 메인 3개 카드 -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-<!-- 하단 전체 검색 결과(버튼/엔터 눌렀을 때) -->
-<div th:if="${results != null}">
-    <p th:if="${#lists.isEmpty(results)}">
-        검색 결과가 없습니다.
-    </p>
+        <!-- 카드 1: 오늘의 날씨는? (계절별 새 이미지) -->
+        <a th:href="@{/search}"
+           class="block border border-slate-300 rounded-xl bg-white hover:shadow-md transition">
+            <div class="p-4 flex flex-col items-center">
+                <h2 class="mb-3 text-lg font-semibold">오늘의 날씨는?</h2>
 
-    <ul th:if="${!#lists.isEmpty(results)}">
-        <li th:each="r : ${results}">
-            <a th:href="@{/region/{city}/{district}(city=${r.parentRegion}, district=${r.childRegion})}"
-               th:text="${r.parentRegion} + ' ' + ${r.childRegion}">
-            </a>
-        </li>
-    </ul>
+                <!-- seasonBirdImage: 컨트롤러에서 넘겨주는 파일명 (spring_bird.png 등) -->
+                <img th:src="@{/images/icons/seasons_bird/{file}(file=${seasonBirdImage})}"
+                     alt="계절 새"
+                     class="w-40 h-40 object-contain mb-3">
+
+                <p class="text-xs text-slate-500">
+                    클릭하면 오늘 날씨와 옷차림을 보여줘요
+                </p>
+            </div>
+        </a>
+
+        <!-- 카드 2: 지금의 절기는? (해 아이콘) -->
+        <a th:href="@{/search}"
+           class="block border border-slate-300 rounded-xl bg-white hover:shadow-md transition">
+            <div class="p-4 flex flex-col items-center">
+                <h2 class="mb-3 text-lg font-semibold">지금의 절기는?</h2>
+
+                <!-- 해 아이콘 (icons/sun.png) -->
+                <img th:src="@{/images/icons/solar_term/sun.png}"
+                     alt="절기 아이콘"
+                     class="w-40 h-40 object-contain mb-3">
+
+                <p class="text-xs text-slate-500">
+                    클릭하면 현재 절기와 절기에 맞는 추천을 알려줘요
+                </p>
+            </div>
+        </a>
+
+        <!-- 카드 3: 오늘의 문구 -->
+        <a th:href="@{/random-quote}"
+           class="block border border-slate-300 rounded-xl bg-white hover:shadow-md transition">
+            <div class="p-4 flex flex-col items-center">
+                <h2 class="mb-3 text-lg font-semibold">오늘의 문구</h2>
+                <div class="w-40 h-40 flex items-center justify-center mb-3 bg-[#fff6f0]
+                            rounded-lg border border-[#ffd9c2]">
+                    <span class="text-sm text-[#7b5cff] font-semibold">
+                        랜덤 문구
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500">
+                    오늘 하루를 위한 작은 한 줄을 랜덤으로 보여줘요
+                </p>
+            </div>
+        </a>
+
+    </section>
 </div>
+
 </body>
 </html>
