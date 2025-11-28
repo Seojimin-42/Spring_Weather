@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>지역 날씨</title>
+</head>
+<body>
+<h2 th:text="${regionName} + ' 날씨 정보'"></h2>
+
+<ul>
+    <li>📌 조회 시각: <span th:text="${weather.requestTime}"></span></li>
+    <li>🕒 기상청 데이터 기준 시각: <span th:text="${weather.time}"></span></li>
+    ----------------------------------------------------------------------------
+    <li>🌡 온도: <span th:text="${weather.temperature}"></span> ℃</li>
+    <li>💧 습도: <span th:text="${weather.humidity}"></span> %</li>
+    <li>☔ 강수량: <span th:text="${weather.rainfall}"></span> mm</li>
+    <li th:if="${weather.umbrellaMessage != null and weather.umbrellaMessage != ''}">
+        🌂 우산 지수: <span th:text="${weather.umbrellaMessage}"></span>
+    </li>
+    <div>
+        <img th:if="${weather.clothesImage != null}"
+             th:src="@{/images/clothes/{file}(file=${weather.clothesImage})}"
+             alt="오늘의 옷차림"
+             style="max-width: 320px; border-radius: 12px;">
+    </div>
+    <li>💬 추천 요약: <span th:text="${weather.clothesSummary}"></span></li>
+    <li>💬 상세 문구: <span th:text="${weather.clothesDetail}"></span></li>
+    ----------------------------------------------------------------------------
+    <li>🌞 현재 절기: <span th:text="${solarTerm}"></span></li>
+    <li>📖 절기 설명: <span th:text="${solarTermDesc}"></span></li>
+    ----------------------------------------------------------------------------
+    <li>🔍 초미세먼지 예보: <span th:text="${pm25}"></span></li>
+    <li>🔍 미세먼지 예보: <span th:text="${pm10}"></span></li>
+    <li>🔍 오존 예보: <span th:text="${o3}"></span></li>
+    <div>
+        <img th:if="${maskImage != null}"
+             th:src="@{/images/bring/{file}(file=${maskImage})}"
+             alt="마스크 착용 안내"
+             style="width:80px; margin-top:8px;">
+    </div>
+    <br>
+    <li th:if="${dustSummary != null}">
+        😷 미세먼지 알림:
+        <span th:text="${dustSummary}"></span>
+    </li>
+</ul>
+
+</body>
+</html>
