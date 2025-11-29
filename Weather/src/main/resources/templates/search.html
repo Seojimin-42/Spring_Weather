@@ -21,36 +21,51 @@
         </p>
     </header>
 
-    <!-- 검색 영역 -->
+    <!-- 🔍 검색 영역 + 자동완성 -->
     <section class="flex justify-center mb-10">
-        <form th:action="@{/search}" method="get" class="flex gap-2">
-            <input
-                    type="text"
-                    name="q"
-                    th:value="${keyword}"
-                    placeholder="예) 서울, 종로, 인천 서구"
-                    class="w-72 px-4 py-2 border border-slate-300 rounded-lg text-sm
-                           focus:outline-none focus:ring-2 focus:ring-[#8ac8ff] focus:border-[#8ac8ff]"
-            />
-            <button
-                    type="submit"
-                    class="px-4 py-2 text-sm font-semibold bg-slate-800 text-white rounded-lg
-                           hover:bg-slate-900 transition">
-                검색
-            </button>
-        </form>
+        <div class="relative w-96">
+            <form th:action="@{/search}" method="get" class="flex gap-2">
+                <input
+                        id="search-input"
+                        type="text"
+                        name="q"
+                        th:value="${keyword}"
+                        placeholder="예) 서울, 종로, 인천 서구"
+                        class="w-96 px-4 py-2 border border-slate-300 rounded-lg text-sm
+                               focus:outline-none focus:ring-2 focus:ring-[#8ac8ff] focus:border-[#8ac8ff]"
+                        autocomplete="off"
+                />
+                <button
+                        type="submit"
+                        class="w-24 py-2 text-sm font-semibold bg-slate-800 text-white rounded-lg
+                               hover:bg-slate-900 transition">
+                    검색
+                </button>
+            </form>
+
+            <!-- ▼ 자동완성 드롭다운 -->
+            <ul id="suggest-list"
+                class="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow
+                       text-sm max-h-60 overflow-y-auto hidden">
+                <!-- JS 로 채워짐 -->
+            </ul>
+        </div>
     </section>
 
     <!-- 메인 3개 카드 -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <!-- 카드 1: 오늘의 날씨는? (계절별 새 이미지) -->
-        <a th:href="@{/search}"
+        <!-- 카드 1: 오늘의 날씨는? -->
+        <!-- 선택된 지역이 있을 때: /region/{city}/{district} 로 이동 -->
+        <a th:if="${selectedRegion != null}"
+           th:href="@{/region/{city}/{district}(
+                        city=${selectedRegion.parentRegion},
+                        district=${selectedRegion.childRegion}
+                    )}"
            class="block border border-slate-300 rounded-xl bg-white hover:shadow-md transition">
             <div class="p-4 flex flex-col items-center">
                 <h2 class="mb-3 text-lg font-semibold">오늘의 날씨는?</h2>
 
-                <!-- seasonBirdImage: 컨트롤러에서 넘겨주는 파일명 (spring_bird.png 등) -->
                 <img th:src="@{/images/icons/seasons_bird/{file}(file=${seasonBirdImage})}"
                      alt="계절 새"
                      class="w-40 h-40 object-contain mb-3">
@@ -58,45 +73,136 @@
                 <p class="text-xs text-slate-500">
                     클릭하면 오늘 날씨와 옷차림을 보여줘요
                 </p>
+                <p class="mt-2 text-xs text-slate-400"
+                   th:text="${selectedRegion.parentRegion} + ' ' + ${selectedRegion.childRegion} + ' 기준'">
+                </p>
             </div>
         </a>
 
-        <!-- 카드 2: 지금의 절기는? (해 아이콘) -->
-        <a th:href="@{/search}"
-           class="block border border-slate-300 rounded-xl bg-white hover:shadow-md transition">
+        <!-- 선택된 지역이 없을 때: 링크 없이 안내만 -->
+        <div th:if="${selectedRegion == null}"
+             class="block border border-slate-300 rounded-xl bg-white">
+            <div class="p-4 flex flex-col items-center">
+                <h2 class="mb-3 text-lg font-semibold">오늘의 날씨는?</h2>
+
+                <img th:src="@{/images/icons/seasons_bird/{file}(file=${seasonBirdImage})}"
+                     alt="계절 새"
+                     class="w-40 h-40 object-contain mb-3">
+
+                <p class="text-xs text-slate-500 text-center">
+                    위 검색창에 지역을 입력하면<br/>해당 지역 기준으로 날씨를 보여줘요
+                </p>
+            </div>
+        </div>
+
+        <!-- 카드 2: 지금의 절기는? -->
+        <div class="block border border-slate-300 rounded-xl bg-white cursor-default">
             <div class="p-4 flex flex-col items-center">
                 <h2 class="mb-3 text-lg font-semibold">지금의 절기는?</h2>
 
-                <!-- 해 아이콘 (icons/sun.png) -->
                 <img th:src="@{/images/icons/solar_term/sun.png}"
                      alt="절기 아이콘"
                      class="w-40 h-40 object-contain mb-3">
 
                 <p class="text-xs text-slate-500">
-                    클릭하면 현재 절기와 절기에 맞는 추천을 알려줘요
+                    현재 절기와 절기에 맞는 추천을 보여줄 예정
                 </p>
             </div>
-        </a>
+        </div>
 
         <!-- 카드 3: 오늘의 문구 -->
-        <a th:href="@{/random-quote}"
-           class="block border border-slate-300 rounded-xl bg-white hover:shadow-md transition">
+        <div class="block border border-slate-300 rounded-xl bg-white cursor-default">
             <div class="p-4 flex flex-col items-center">
                 <h2 class="mb-3 text-lg font-semibold">오늘의 문구</h2>
                 <div class="w-40 h-40 flex items-center justify-center mb-3 bg-[#fff6f0]
-                            rounded-lg border border-[#ffd9c2]">
-                    <span class="text-sm text-[#7b5cff] font-semibold">
-                        랜덤 문구
-                    </span>
+                    rounded-lg border border-[#ffd9c2]">
+            <span class="text-sm text-[#7b5cff] font-semibold">
+                랜덤 문구
+            </span>
                 </div>
                 <p class="text-xs text-slate-500">
-                    오늘 하루를 위한 작은 한 줄을 랜덤으로 보여줘요
+                    오늘 하루를 위한 작은 한 줄을 보여줄 예정
                 </p>
             </div>
-        </a>
+        </div>
+
 
     </section>
 </div>
+
+<!-- 🔧 자동완성 JS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("search-input");
+        const list = document.getElementById("suggest-list");
+
+        if (!input || !list) {
+            console.log("검색 input 또는 suggest-list를 찾지 못했습니다.");
+            return;
+        }
+
+        let lastQuery = "";
+
+        input.addEventListener("input", async () => {
+            const q = input.value.trim();
+
+            if (q.length === 0) {
+                list.classList.add("hidden");
+                list.innerHTML = "";
+                lastQuery = "";
+                return;
+            }
+
+            if (q === lastQuery) return;
+            lastQuery = q;
+
+            try {
+                const resp = await fetch("/search/suggest?q=" + encodeURIComponent(q));
+                console.log("suggest status:", resp.status);
+
+                if (!resp.ok) {
+                    list.classList.add("hidden");
+                    return;
+                }
+
+                const data = await resp.json();
+                console.log("suggest data:", data);
+
+                list.innerHTML = "";
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    list.classList.add("hidden");
+                    return;
+                }
+
+                data.forEach(item => {
+                    const li = document.createElement("li");
+                    li.textContent = `${item.parentRegion} ${item.childRegion}`;
+                    li.className = "px-3 py-1 cursor-pointer bg-white hover:bg-slate-100";
+
+                    li.addEventListener("click", () => {
+                        input.value = li.textContent;
+                        list.classList.add("hidden");
+                        list.innerHTML = "";
+                    });
+
+                    list.appendChild(li);
+                });
+
+                list.classList.remove("hidden");
+            } catch (e) {
+                console.error("suggest error:", e);
+                list.classList.add("hidden");
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (e.target !== input && !list.contains(e.target)) {
+                list.classList.add("hidden");
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

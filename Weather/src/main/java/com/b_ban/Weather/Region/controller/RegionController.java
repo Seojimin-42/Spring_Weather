@@ -31,33 +31,36 @@ public class RegionController {
 
     // 처음 접속하면 검색 페이지 보여주기
     @GetMapping("/")
-    public String showSearchPage(Model model) {
+    public String showMain(Model model) {
+        model.addAttribute("seasonBirdImage", pickSeasonBirdImage());
+        return "search";
+    }
 
-        // 현재 월 기준으로 4계절 나누기
+    // 계절별 새 이미지 선택 함수
+    private String pickSeasonBirdImage() {
         int month = LocalDate.now().getMonthValue();
-        String seasonBird;
-
-        if (month == 3 || month == 4 || month == 5) {
-            seasonBird = "spring_bird.png";
-        } else if (month == 6 || month == 7 || month == 8) {
-            seasonBird = "summer_bird.png";
-        } else if (month == 9 || month == 10 || month == 11) {
-            seasonBird = "fall_bird.png";
-        } else {
-            seasonBird = "winter_bird.png";
-        }
-
-        model.addAttribute("seasonBirdImage", seasonBird);
-
-        return "search";   // 아래에서 만들 search.html
+        if (month == 3 || month == 4 || month == 5) return "spring_bird.png";
+        if (month == 6 || month == 7 || month == 8) return "summer_bird.png";
+        if (month == 9 || month == 10 || month == 11) return "fall_bird.png";
+        return "winter_bird.png";
     }
 
     // 검색 실행 (ex. /search?q=서울)
     @GetMapping("/search")
-    public String searchRegions(@RequestParam("q") String keyword, Model model) {
+    public String searchRegions(@RequestParam(value = "q", required = false) String keyword,
+                                Model model) {
+
+        if (keyword == null || keyword.isBlank()) {
+            return "redirect:/";
+        }
+
         List<RegionDto> results = regionService.searchRegions(keyword);
+        RegionDto selectedRegion = results.isEmpty() ? null : results.get(0);
+
         model.addAttribute("keyword", keyword);
-        model.addAttribute("results", results);
+        model.addAttribute("selectedRegion", selectedRegion);
+        model.addAttribute("seasonBirdImage", pickSeasonBirdImage());
+
         return "search";
     }
 
@@ -105,5 +108,4 @@ public class RegionController {
 
         return "list";
     }
-
 }

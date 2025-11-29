@@ -66,9 +66,37 @@ public class RegionService {
 
     // 검색용 메서드 추가
     public List<RegionDto> searchRegions(String keyword) {
-        return regionRepository
-                .findByParentRegionContainsOrChildRegionContains(keyword, keyword)
-                .stream()
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+
+        String k = keyword.trim();
+        String[] parts = k.split("\\s+");
+
+        List<Region> regions;
+
+        if (parts.length >= 2) {
+            // "인천 서구", "서울 중구" 처럼 띄어쓰기 2개 이상 입력한 경우
+            String city = parts[0];
+            String district = parts[1];
+
+            // 1차: 시+구 모두 포함하는 애들만 AND 검색
+            regions = regionRepository
+                    .findByParentRegionContainsAndChildRegionContains(city, district);
+
+            // 혹시 결과가 0개면 → 그냥 전체 문자열로 OR 검색으로 fallback
+            if (regions.isEmpty()) {
+                regions = regionRepository
+                        .findByParentRegionContainsOrChildRegionContains(k, k);
+            }
+
+        } else {
+            // "서울", "서구" 같이 한 단어만 입력한 경우
+            regions = regionRepository
+                    .findByParentRegionContainsOrChildRegionContains(k, k);
+        }
+
+        return regions.stream()
                 .map(r -> RegionDto.builder()
                         .id(r.getId())
                         .parentRegion(r.getParentRegion())

@@ -13,4 +13,7 @@ public interface RegionRepository extends JpaRepository<Region, Long> {
 
     // parentRegion LIKE '%서울%' OR childRegion LIKE '%서울%'
     List<Region> findByParentRegionContainsOrChildRegionContains(String parentKeyword, String childKeyword);
+
+    // parentRegion LIKE '%서울%' AND childRegion LIKE '%서울%'
+    List<Region> findByParentRegionContainsAndChildRegionContains(String parentKeyword, String childKeyword);
 }
