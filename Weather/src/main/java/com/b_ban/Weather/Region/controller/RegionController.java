@@ -38,11 +38,44 @@ public class RegionController {
 
     // 계절별 새 이미지 선택 함수
     private String pickSeasonBirdImage() {
-        int month = LocalDate.now().getMonthValue();
-        if (month == 3 || month == 4 || month == 5) return "spring_bird.png";
-        if (month == 6 || month == 7 || month == 8) return "summer_bird.png";
-        if (month == 9 || month == 10 || month == 11) return "fall_bird.png";
-        return "winter_bird.png";
+        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
+
+        // null 이면 기본값 하나 주기
+        if (solarTerm == null) {
+            return "spring_bird.png";
+        }
+
+        // 봄 절기
+        if (isInSolarTerm(solarTerm, "입춘", "우수", "경칩", "춘분", "청명", "곡우")) {
+            return "spring_bird.png";
+        }
+
+        // 여름 절기
+        if (isInSolarTerm(solarTerm, "입하", "소만", "망종", "하지", "소서", "대서")) {
+            return "summer_bird.png";
+        }
+
+        // 가을 절기
+        if (isInSolarTerm(solarTerm, "입추", "처서", "백로", "추분", "한로", "상강")) {
+            return "fall_bird.png";
+        }
+
+        // 겨울 절기
+        if (isInSolarTerm(solarTerm, "입동", "소설", "대설", "동지", "소한", "대한")) {
+            return "winter_bird.png";
+        }
+
+        // 위에 없는 값이 들어오면 그냥 기본 값
+        return "spring_bird.png";
+    }
+
+    private boolean isInSolarTerm(String target, String... terms) {
+        for (String term : terms) {
+            if (term.equals(target)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // 검색 실행 (ex. /search?q=서울)
@@ -60,6 +93,11 @@ public class RegionController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedRegion", selectedRegion);
         model.addAttribute("seasonBirdImage", pickSeasonBirdImage());
+
+        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
+
+        model.addAttribute("solarTerm", solarTerm); // 절기 추가
+        model.addAttribute("solarTermDesc", SolarTermDescription.getDescription(solarTerm)); // 절기 설명 추가
 
         return "search";
     }

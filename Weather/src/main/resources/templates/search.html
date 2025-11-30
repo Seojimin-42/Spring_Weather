@@ -24,7 +24,7 @@
     <!-- 🔍 검색 영역 + 자동완성 -->
     <section class="flex justify-center mb-10">
         <div class="relative w-96">
-            <form th:action="@{/search}" method="get" class="flex gap-2">
+            <form id="search-form" th:action="@{/search}" method="get" class="flex gap-2">
                 <input
                         id="search-input"
                         type="text"
@@ -70,10 +70,10 @@
                      alt="계절 새"
                      class="w-40 h-40 object-contain mb-3">
 
-                <p class="text-xs text-slate-500">
+                <p class="text-xs text-slate-500 text-center leading-relaxed">
                     클릭하면 오늘 날씨와 옷차림을 보여줘요
                 </p>
-                <p class="mt-2 text-xs text-slate-400"
+                <p class="mt-2 text-xs text-slate-400 text-center leading-relaxed"
                    th:text="${selectedRegion.parentRegion} + ' ' + ${selectedRegion.childRegion} + ' 기준'">
                 </p>
             </div>
@@ -90,7 +90,7 @@
                      class="w-40 h-40 object-contain mb-3">
 
                 <p class="text-xs text-slate-500 text-center">
-                    위 검색창에 지역을 입력하면<br/>해당 지역 기준으로 날씨를 보여줘요
+                    위 검색창에 지역을 입력하면<br>해당 지역 기준으로 날씨를 보여줘요
                 </p>
             </div>
         </div>
@@ -104,9 +104,13 @@
                      alt="절기 아이콘"
                      class="w-40 h-40 object-contain mb-3">
 
-                <p class="text-xs text-slate-500">
-                    현재 절기와 절기에 맞는 추천을 보여줄 예정
+                <p class="text-xs text-slate-500 text-center">
+                    🌞 현재 절기 : <span th:text="${solarTerm}"></span><br>
                 </p>
+                <p class="mt-2 text-xs text-slate-400 text-center leading-relaxed break-keep max-w-xs mx-auto">
+                    <span th:text="${solarTermDesc}"></span>
+                </p>
+
             </div>
         </div>
 
@@ -184,6 +188,11 @@
                         input.value = li.textContent;
                         list.classList.add("hidden");
                         list.innerHTML = "";
+
+                        const form = document.getElementById("search-form");
+                        if (form) {
+                            form.submit();
+                        }
                     });
 
                     list.appendChild(li);
