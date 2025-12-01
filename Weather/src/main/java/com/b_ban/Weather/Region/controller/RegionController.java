@@ -1,12 +1,13 @@
 package com.b_ban.Weather.Region.controller;
 
+import com.b_ban.Weather.Common.service.SeasonThemeService;
 import com.b_ban.Weather.Common.util.SolarTermCalculator;
 import com.b_ban.Weather.Common.util.SolarTermDescription;
 import com.b_ban.Weather.Dust.service.DustService;
+import com.b_ban.Weather.Memo.service.MemoService;
 import com.b_ban.Weather.Region.dto.RegionDto;
 import com.b_ban.Weather.Region.service.RegionService;
 import com.b_ban.Weather.Weather.dto.WeatherDto;
-import com.b_ban.Weather.Dust.service.DustService;
 import com.b_ban.Weather.Weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -28,11 +29,41 @@ public class RegionController {
     private final RegionService regionService;
     private final WeatherService weatherService;
     private final DustService dustService;
+    private final MemoService memoService;
+    private final SeasonThemeService seasonThemeService;
 
     // 처음 접속하면 검색 페이지 보여주기
     @GetMapping("/")
-    public String showMain(Model model) {
-        model.addAttribute("seasonBirdImage", pickSeasonBirdImage());
+    public String showMain(@RequestParam(value = "debugTerm", required = false) String debugTerm,
+            Model model) {
+
+        // 검색창 기본값, 선택된 지역 없음
+        model.addAttribute("keyword", "");
+        model.addAttribute("selectedRegion", null);
+
+        // 현재 절기 + 설명
+        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
+
+        // 배경, 이미지 점검
+//        String solarTerm= "입하";
+
+        if (debugTerm != null && !debugTerm.isBlank()) {
+            solarTerm = debugTerm;
+        }
+
+        model.addAttribute("solarTerm", solarTerm);
+        model.addAttribute("solarTermDesc",
+                SolarTermDescription.getDescription(solarTerm));
+
+        // 배경, 새 이미지, 글자 색(H,i,weather)
+        model.addAttribute("seasonBirdImage", seasonThemeService.pickSeasonBirdImage(solarTerm));
+        model.addAttribute("seasonBgClass", seasonThemeService.pickSeasonBgClass(solarTerm));
+        model.addAttribute("seasonTitleClass", seasonThemeService.getTitleTextClass(solarTerm));
+
+        // 오늘의 문구
+        String memo = memoService.getRandomQuote();
+        model.addAttribute("todayMemo", memo);
+
         return "search";
     }
 
@@ -98,6 +129,15 @@ public class RegionController {
 
         model.addAttribute("solarTerm", solarTerm); // 절기 추가
         model.addAttribute("solarTermDesc", SolarTermDescription.getDescription(solarTerm)); // 절기 설명 추가
+
+        // 배경, 새 이미지, 글자 색(H,i,weather)
+        model.addAttribute("seasonBirdImage", seasonThemeService.pickSeasonBirdImage(solarTerm));
+        model.addAttribute("seasonBgClass", seasonThemeService.pickSeasonBgClass(solarTerm));
+        model.addAttribute("seasonTitleClass", seasonThemeService.getTitleTextClass(solarTerm));
+
+        // 오늘의 문구
+        String memo = memoService.getRandomQuote();
+        model.addAttribute("todayMemo", memo);
 
         return "search";
     }

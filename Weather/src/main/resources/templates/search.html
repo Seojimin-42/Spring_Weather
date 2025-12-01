@@ -6,20 +6,35 @@
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-[#fddfe8] flex items-center justify-center">
-
+<!-- 배경 -->
+<body th:class="'min-h-screen flex items-center justify-center ' + ${seasonBgClass}">
 <div class="w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl px-10 py-10">
 
     <!-- 상단 타이틀 -->
     <header class="text-center mb-8">
         <h1 class="text-5xl font-black leading-tight">
-            <span class="block text-[#4c82ff]">How is the</span>
-            <span class="block text-[#8ac8ff]">Weather</span>
+        <span class="block">
+            <!-- H 만 계절 색상 -->
+            <span th:class="${seasonTitleClass}">H</span>
+            <!-- 나머지는 검정 -->
+            <span class="text-slate-900">ow </span>
+
+            <!-- i 만 계절 색상 -->
+            <span th:class="${seasonTitleClass}">i</span>
+            <span class="text-slate-900">s the</span>
+        </span>
+
+            <span class="block">
+            <!-- Weather 전체를 계절 색상 -->
+            <span th:class="${seasonTitleClass}">Weather</span>
+        </span>
         </h1>
+
         <p class="mt-2 tracking-[0.3em] text-xs text-slate-500">
             PLAN TOUR DAY
         </p>
     </header>
+
 
     <!-- 🔍 검색 영역 + 자동완성 -->
     <section class="flex justify-center mb-10">
@@ -87,9 +102,9 @@
 
                 <img th:src="@{/images/icons/seasons_bird/{file}(file=${seasonBirdImage})}"
                      alt="계절 새"
-                     class="w-40 h-40 object-contain mb-3">
+                     class="mt-1 w-40 h-40 object-contain mb-3">
 
-                <p class="text-xs text-slate-500 text-center">
+                <p class="mt-3 text-xs text-slate-500 text-center">
                     위 검색창에 지역을 입력하면<br>해당 지역 기준으로 날씨를 보여줘요
                 </p>
             </div>
@@ -104,12 +119,14 @@
                      alt="절기 아이콘"
                      class="w-40 h-40 object-contain mb-3">
 
-                <p class="text-xs text-slate-500 text-center">
-                    🌞 현재 절기 : <span th:text="${solarTerm}"></span><br>
-                </p>
-                <p class="mt-2 text-xs text-slate-400 text-center leading-relaxed break-keep max-w-xs mx-auto">
-                    <span th:text="${solarTermDesc}"></span>
-                </p>
+                <div class="flex flex-col items-center text-center text-xs leading-tight">
+                    <p class="text-slate-500">
+                        🌞 현재 절기 : <span th:text="${solarTerm}"></span>
+                    </p>
+                    <p class="text-slate-400 whitespace-pre-line -mt-0.5">
+                        <span th:text="${solarTermDesc}"></span>
+                    </p>
+                </div>
 
             </div>
         </div>
@@ -118,19 +135,18 @@
         <div class="block border border-slate-300 rounded-xl bg-white cursor-default">
             <div class="p-4 flex flex-col items-center">
                 <h2 class="mb-3 text-lg font-semibold">오늘의 문구</h2>
+
                 <div class="w-40 h-40 flex items-center justify-center mb-3 bg-[#fff6f0]
-                    rounded-lg border border-[#ffd9c2]">
-            <span class="text-sm text-[#7b5cff] font-semibold">
-                랜덤 문구
-            </span>
+                    rounded-lg border border-[#ffd9c2] px-3 text-center">
+            <span class="text-sm text-slate-800 leading-relaxed"
+                  th:text="${todayMemo}">랜덤 문구</span>
                 </div>
-                <p class="text-xs text-slate-500">
-                    오늘 하루를 위한 작은 한 줄을 보여줄 예정
+
+                <p class="text-xs text-slate-500 text-center">
+                    오늘 하루를 위한 작은 한 줄이에요
                 </p>
             </div>
         </div>
-
-
     </section>
 </div>
 
