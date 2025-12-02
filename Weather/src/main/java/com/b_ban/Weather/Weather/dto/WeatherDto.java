@@ -23,4 +23,6 @@ public class WeatherDto {
     private String clothesDetail;    // 상세 문구
     private String clothesSummary;   // 한 줄 요약
 
+    private String rainImage; // 비 장비 이미지
+
 }

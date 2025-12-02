@@ -45,7 +45,7 @@ public class RegionController {
         String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
 
         // 배경, 이미지 점검
-//        String solarTerm= "입하";
+//        String solarTerm= "입동";
 
         if (debugTerm != null && !debugTerm.isBlank()) {
             solarTerm = debugTerm;
@@ -63,6 +63,9 @@ public class RegionController {
         // 오늘의 문구
         String memo = memoService.getRandomQuote();
         model.addAttribute("todayMemo", memo);
+
+        // 계절별 메모 박스 색상
+        model.addAttribute("memoBoxClass", seasonThemeService.getMemoBoxClass(solarTerm));
 
         return "search";
     }
@@ -139,6 +142,9 @@ public class RegionController {
         String memo = memoService.getRandomQuote();
         model.addAttribute("todayMemo", memo);
 
+        // 계절별 메모 박스 색상
+        model.addAttribute("memoBoxClass", seasonThemeService.getMemoBoxClass(solarTerm));
+
         return "search";
     }
 
@@ -181,8 +187,16 @@ public class RegionController {
         String maskImage = dustService.getMaskImageForForecast(pm10, pm25);
         String dustSummary = dustService.buildDustSummary(pm10, pm25);
 
+          // 테스트용
+//        model.addAttribute("maskImage", "mask.png");
+//        model.addAttribute("rainImage", "raining.png");
+
         model.addAttribute("maskImage", maskImage);
+        model.addAttribute("rainImage", weather.getRainImage());
         model.addAttribute("dustSummary", dustSummary);
+
+        // 계절 별 배경 색
+        model.addAttribute("seasonBgClass", seasonThemeService.pickSeasonBgClass(solarTerm));
 
         return "list";
     }

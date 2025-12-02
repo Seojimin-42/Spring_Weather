@@ -180,10 +180,12 @@ public class WeatherService {
         }
 
         // 우산 추천 메시지
-        String umbrellaMessage = "";
+        String umbrellaMessage = null;
+        String rainImage = null;
 
         if (humidity != null && humidity >= 80) {
-            umbrellaMessage = "습도가 높아 비 올 가능성이 있어요. 우산 챙기면 좋아요!";
+            umbrellaMessage = "습도가 높아요. 가벼운 우산을 챙기면 좋아요!";
+            rainImage = "raining.png";   // bring/raining.png
         }
 
         // 옷 추천
@@ -199,6 +201,7 @@ public class WeatherService {
                 .clothesImage(clothes.clothesImage())
                 .clothesDetail(clothes.clothesDetail())
                 .clothesSummary(clothes.clothesSummary())
+                .rainImage(rainImage)
                 .build();
     }
 

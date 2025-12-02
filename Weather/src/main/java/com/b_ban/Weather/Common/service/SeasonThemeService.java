@@ -2,6 +2,7 @@ package com.b_ban.Weather.Common.service;
 
 import org.springframework.stereotype.Service;
 
+// SeasonThemeService.java
 @Service
 public class SeasonThemeService {
     // 계절별 새 이미지 선택
@@ -85,23 +86,49 @@ public class SeasonThemeService {
             return "text-pink-500"; // 기본값
         }
 
-        if (isInSolarTerm(solarTerm)) {
-            // 봄: 배경이 연핑크 계열이면 진한 핑크 톤
-            return "text-pink-500";
+        if (isInSolarTerm(solarTerm, "입춘","우수","경칩","춘분","청명","곡우")) {
+            return "text-pink-500";      // 봄
         }
-        if (isInSolarTerm(solarTerm)) {
-            // 여름: 빨강/코랄
-            return "text-rose-500";
+        if (isInSolarTerm(solarTerm, "입하","소만","망종","하지","소서","대서")) {
+            return "text-rose-500";      // 여름
         }
-        if (isInSolarTerm(solarTerm)) {
-            // 가을: 주황
-            return "text-orange-500";
+        if (isInSolarTerm(solarTerm, "입추","처서","백로","추분","한로","상강")) {
+            return "text-orange-500";    // 가을
         }
-        if (isInSolarTerm(solarTerm)) {
-            // 겨울: 파랑
-            return "text-[#0ea5e9]";
+        if (isInSolarTerm(solarTerm, "입동","소설","대설","동지","소한","대한")) {
+            return "text-[#0ea5e9]";     // 겨울
         }
+
         return "text-sky-500";
+    }
+
+    public String getMemoBoxClass(String solarTerm) {
+
+        if (solarTerm == null) {
+            return "bg-[#f7f0f3] border-[#d8b8c7]";  // 기본(부드러운 핑크톤)
+        }
+
+        // 봄
+        if (isInSolarTerm(solarTerm, "입춘","우수","경칩","춘분","청명","곡우")) {
+            return "bg-[#ffe0ef] border-[#ff9ac7]";
+        }
+
+        // 여름
+        if (isInSolarTerm(solarTerm, "입하","소만","망종","하지","소서","대서")) {
+            return "bg-[#ffd9c8] border-[#ff8f65]";
+        }
+
+        // 가을
+        if (isInSolarTerm(solarTerm, "입추","처서","백로","추분","한로","상강")) {
+            return "bg-[#ffe7c2] border-[#ffb347]";
+        }
+
+        // 겨울
+        if (isInSolarTerm(solarTerm, "입동","소설","대설","동지","소한","대한")) {
+            return "bg-[#d6e9ff] border-[#78b7ff]";
+        }
+
+        return "bg-[#f7f0f3] border-[#d8b8c7]";
     }
 
     // 공통 헬퍼
