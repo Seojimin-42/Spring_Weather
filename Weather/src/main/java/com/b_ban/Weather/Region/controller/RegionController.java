@@ -45,7 +45,7 @@ public class RegionController {
         String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
 
         // 배경, 이미지 점검
-//        String solarTerm= "입동";
+//        String solarTerm= "입추";
 
         if (debugTerm != null && !debugTerm.isBlank()) {
             solarTerm = debugTerm;
@@ -103,6 +103,8 @@ public class RegionController {
         return "spring_bird.png";
     }
 
+    // String...terms는 String[] terms를 편하게 받는 가변 인자 문법
+    // for(String term : terms)는 배열 전체를 도는 for문    
     private boolean isInSolarTerm(String target, String... terms) {
         for (String term : terms) {
             if (term.equals(target)) {
