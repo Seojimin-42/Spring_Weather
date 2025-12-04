@@ -134,9 +134,10 @@ public class SeasonThemeService {
     // 공통 헬퍼
     private boolean isInSolarTerm(String target, String... terms) {
         if (target == null) return false;
-        for (String term : terms) {
+        for (String term : terms) { // for(타입 변수이름 : 배열)
             if (term.equals(target)) return true;
         }
         return false;
     }
 }
+
