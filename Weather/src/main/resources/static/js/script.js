@@ -1,16 +1,15 @@
 // /static/js/script.js
 
-$(() => {
-    const $input = $('#region-input');
-    const $suggestBox = $('#suggest-box');
-    const $suggestList = $('#suggest-list');
+$(function () {
+    const $input = $('#search-input');   // 현재 HTML에 있는 id
+    const $list  = $('#suggest-list');   // 이게 곧 표시/숨길 박스 역할
 
     function showSuggest() {
-        $suggestBox.removeClass('hidden');
+        $list.removeClass('hidden');
     }
 
     function hideSuggest() {
-        $suggestBox.addClass('hidden');
+        $list.addClass('hidden').empty();   // 숨기면서 내용도 비우기
     }
 
     // 입력할 때마다 자동완성 요청
@@ -27,7 +26,7 @@ $(() => {
             url: '/search/suggest',
             method: 'GET',
             data: { q },          // => /search/suggest?q=중구
-            dataType: 'json',     // JSON으로 받겠다고 명시
+            dataType: 'json',
             success: (items) => {
                 console.log('[suggest] items =', items);
                 renderSuggest(items);
@@ -40,7 +39,7 @@ $(() => {
     });
 
     function renderSuggest(items) {
-        $suggestList.empty();
+        $list.empty();
 
         if (!items || items.length === 0) {
             hideSuggest();
@@ -49,34 +48,31 @@ $(() => {
 
         items.forEach((r) => {
             const $li = $(`
-                <li class="suggest-item">
-                    <div class="suggest-region">${r.parentRegion} ${r.childRegion}</div>
-                    <div class="suggest-sub">날씨 보기</div>
+                <li class="px-3 py-1 cursor-pointer bg-white hover:bg-slate-100">
+                    ${r.parentRegion} ${r.childRegion}
                 </li>
             `);
 
-            // 마우스로 누를 때 바로 이동 (blur보다 먼저 실행되라고 mousedown 사용)
+            // 클릭하면 검색창에 넣고 폼 제출
             $li.on('mousedown', () => {
-                const city = encodeURIComponent(r.parentRegion);
-                const district = encodeURIComponent(r.childRegion);
-                window.location.href = `/region/${city}/${district}`;
+                $('#search-input').val(`${r.parentRegion} ${r.childRegion}`);
+
+                const form = document.getElementById('search-form');
+                if (form) form.submit();
+
+                hideSuggest();
             });
 
-            $suggestList.append($li);
+            $list.append($li);
         });
 
         showSuggest();
     }
 
-    // 인풋에서 포커스 빠지면 조금 있다가 자동완성 닫기
-    $input.on('blur', () => {
-        setTimeout(hideSuggest, 150);
-    });
-
-    // 다시 포커스 들어오면 값이 있고 리스트가 있으면 다시 보여주기
-    $input.on('focus', () => {
-        if ($input.val().trim().length > 0 && $suggestList.children().length > 0) {
-            showSuggest();
+    // 인풋 밖을 클릭하면 닫기
+    $(document).on('click', (e) => {
+        if (!$(e.target).closest('#search-input, #suggest-list').length) {
+            hideSuggest();
         }
     });
 });

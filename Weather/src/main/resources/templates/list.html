@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>지역 날씨</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
 </head>
 
 <body th:class="'min-h-screen flex justify-center px-4 py-10 ' + ${seasonBgClass}">
