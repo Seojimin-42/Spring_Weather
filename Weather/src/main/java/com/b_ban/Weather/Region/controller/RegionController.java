@@ -42,10 +42,10 @@ public class RegionController {
         model.addAttribute("selectedRegion", null);
 
         // 현재 절기 + 설명
-        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
+//        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
 
         // 배경, 이미지 점검
-//        String solarTerm= "입추";
+        String solarTerm= "입추";
 
         if (debugTerm != null && !debugTerm.isBlank()) {
             solarTerm = debugTerm;
@@ -176,6 +176,11 @@ public class RegionController {
 
         String today = LocalDate.now().toString(); // 오늘날짜
 
+        // 대기질 테스트용
+//        String pm25 = "나쁨";
+//        String pm10 = "매우 나쁨";
+//        String o3   = "보통";
+        
         // ) 대기질 예보 통보
         String pm25 = dustService.getAirForecast(today, city,"PM25"); // 초미세먼지(예보)
         String pm10 = dustService.getAirForecast(today, city,"PM10");  // 미세먼지(예보)
@@ -189,7 +194,7 @@ public class RegionController {
         String maskImage = dustService.getMaskImageForForecast(pm10, pm25);
         String dustSummary = dustService.buildDustSummary(pm10, pm25);
 
-          // 테스트용
+        // 마스크, 우산 이미지 테스트용
 //        model.addAttribute("maskImage", "mask.png");
 //        model.addAttribute("rainImage", "raining.png");
 

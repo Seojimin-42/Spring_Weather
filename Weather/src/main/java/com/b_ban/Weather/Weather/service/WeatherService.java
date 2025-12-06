@@ -44,8 +44,18 @@ public class WeatherService {
         Region region = regionService.getRegion(parent, child);
 
         // 기상청 요청을 위한 날짜 + 기준시간 얻기
-        String baseDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 날짜
-        String baseTime = getNearestBaseTime(); // 시간 규칙 처리
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        String baseDate = today.format(dateFmt);   // 기본은 오늘 날짜
+        String baseTime = getNearestBaseTime();    // 네가 만든 로직 그대로 사용
+
+        // 자정(00시) + 40분 이전이면, 전날 23시 데이터를 써야 하므로 날짜를 어제로 보정
+        if (now.getHour() == 0 && now.getMinute() < 40 && "2300".equals(baseTime)) {
+            baseDate = today.minusDays(1).format(dateFmt);
+        }
 
         // 키를 여기서 직접 URL Encode
         String encodedKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
