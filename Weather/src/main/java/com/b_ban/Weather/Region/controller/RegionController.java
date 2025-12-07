@@ -42,10 +42,10 @@ public class RegionController {
         model.addAttribute("selectedRegion", null);
 
         // 현재 절기 + 설명
-//        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
+        String solarTerm = SolarTermCalculator.getCurrentSolarTerm();
 
         // 배경, 이미지 점검
-        String solarTerm= "입추";
+//        String solarTerm= "입추";
 
         if (debugTerm != null && !debugTerm.isBlank()) {
             solarTerm = debugTerm;
