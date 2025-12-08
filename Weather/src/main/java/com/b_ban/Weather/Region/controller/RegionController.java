@@ -153,7 +153,7 @@ public class RegionController {
     // 검색 자동완성
     @GetMapping("/search/suggest")
     @ResponseBody
-    public List<RegionDto> suggestRegions(@RequestParam("q") String keyword) {
+    public List<RegionDto> suggestRegions(@RequestParam("q") String keyword) { // URL에 q라는 이름 값을 받아 Keyword 변수에 매핑
         return regionService.searchRegions(keyword);
     }
 
