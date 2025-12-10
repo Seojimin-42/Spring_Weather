@@ -131,7 +131,8 @@ public class SeasonThemeService {
         return "bg-[#f7f0f3] border-[#d8b8c7]";
     }
 
-    // 공통 헬퍼
+    // target(현재 절기)가 전달된 여러 절기 이름들(terms) 중 하나와 일치하는지 검사하는 헬퍼 메서드
+    // String... terms는 여러 개 문자열을 한 번에 받는 가변 인자 ex. isInSolarTerm(...)
     private boolean isInSolarTerm(String target, String... terms) {
         if (target == null) return false;
         for (String term : terms) {

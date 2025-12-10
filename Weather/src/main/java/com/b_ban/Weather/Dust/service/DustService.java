@@ -181,7 +181,7 @@ public class DustService {
         // null 방지용으로 안전하게 문자열 합치기
         String combined =
                 (pm10Grade == null ? "" : pm10Grade) + " " +
-                        (pm25Grade == null ? "" : pm25Grade);
+                (pm25Grade == null ? "" : pm25Grade);
 
         return pickMaskImage(combined);  // "나쁨" 들어 있으면 mask.png, 아니면 null
     }
