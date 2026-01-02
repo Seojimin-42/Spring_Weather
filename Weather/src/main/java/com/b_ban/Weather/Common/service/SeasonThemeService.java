@@ -13,6 +13,7 @@ public class SeasonThemeService {
 
         // 🌸 봄
         if (isInSolarTerm(solarTerm, "입춘", "우수", "경칩", "춘분", "청명", "곡우")) {
+            // 봄 안에서도 좀 더 세분화하려면 여기서 조건 더 나눌 수도 있음
             return "spring_bird.png";
         }
 
@@ -50,7 +51,7 @@ public class SeasonThemeService {
         if (isInSolarTerm(solarTerm, "곡우")) {
             return "bg-[#ffd4d4]";   // 여름로 넘어가는 핑크+연레드
 
-            // 🔥 여름 초기 / 중 / 말
+            // 🔥 여름
         } else if (isInSolarTerm(solarTerm, "입하", "소만")) {
             return "bg-[#ffe0d5]";   // 연코랄
         } else if (isInSolarTerm(solarTerm, "망종", "하지")) {
@@ -58,7 +59,7 @@ public class SeasonThemeService {
         } else if (isInSolarTerm(solarTerm, "소서", "대서")) {
             return "bg-[#ffc7aa]";   // 더위 막바지
 
-            // 🍂 가을 초기 / 중 / 말
+            // 🍂 가을
         } else if (isInSolarTerm(solarTerm, "입추", "처서")) {
             return "bg-[#fff0d6]";   // 연한 주황
         } else if (isInSolarTerm(solarTerm, "백로", "추분")) {
@@ -66,7 +67,7 @@ public class SeasonThemeService {
         } else if (isInSolarTerm(solarTerm, "한로", "상강")) {
             return "bg-[#ffc78a]";   // 깊어지는 가을
 
-            // ❄ 겨울 초기 / 중 / 말
+            // ❄ 겨울
         } else if (isInSolarTerm(solarTerm, "입동", "소설")) {
             return "bg-[#e0f2ff]";   // 연하늘
         } else if (isInSolarTerm(solarTerm, "대설", "동지")) {
@@ -140,4 +141,3 @@ public class SeasonThemeService {
         return false;
     }
 }
-
